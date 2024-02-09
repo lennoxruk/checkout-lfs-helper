@@ -1,0 +1,19 @@
+name: Checkout LFS Hack
+description: 🚀 Action to retrieve LFS files in a Gitea workflow
+
+runs:
+  using: composite
+  steps:
+    - name: Audit tools
+      shell: bash
+      run: |
+        which git git-lfs
+        git version
+        git lfs version
+
+    - name: Checkout LFS helper
+      shell: bash
+      run: bash "$GITHUB_ACTION_PATH/checkout-lfs-helper.sh"
+      env:
+        INPUT_GITEA_REPO: ${{ gitea.repository }}
+        INPUT_GITEA_REF: ${{ gitea.ref }}
