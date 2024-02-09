@@ -1,0 +1,31 @@
+name: Test Checkout LFS hack
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - LICENSE
+      - README.md
+      - version.svg
+
+jobs:
+  lfsTest:
+    name: Verify LFS download
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout action code
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+          fetch-depth: 0
+
+      # - name: Invoke checkout-lfs-hack action
+      #   uses: ./
+
+      - name: Verify test file download
+        shell: bash
+        run: |
+          ls -al test/
+          md5sum test/test.jpg
+          echo "77d1144344ad11763129a49c6a4e47a0  test/test.jpg" | md5sum -c -
