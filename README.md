@@ -7,18 +7,18 @@ When retrieving LFS files within a Gitea Actions workflow, the action _actions/c
 For example, the following actions step, will retrieve binary files but the contents will not be downloaded correctly.
 
 ```yaml
-- name: Check out repository code
+- name: Check out repository - this does not work in gitea workflows
   uses: actions/checkout@v4
   with:
     lfs: true
     fetch-depth: 0
 ```
 
-This Gitea Action is a hack for retrieving LFS files in a Gitea workflow. It is just a simple workaround for the problem, see [background](#background) for explanation.
+This Gitea Action is a workaround for retrieving LFS files in a Gitea workflow. It is just a simple workaround for the problem, see [background](#background) for explanation.
 
 ## How to use
 
-Use in workflow as below, just invoke the checkout-lfs-hack action after the checkout step.
+Use in workflow as below, just invoke the checkout-lfs-helper action after the checkout step.
 
 ```yaml
 jobs:
@@ -37,29 +37,29 @@ jobs:
           fetch-depth: 0
 
       - name: Checkout LFS
-        uses: lennoxruk/checkout-lfs-hack@v1.0
+        uses: lennoxruk/checkout-lfs-helper@v1.0
 ```
 
 Ensure git-lfs is available in workflow; it can be added by including the following step before invoking the action if necessary.
 
 ```yaml
-- name: Install dependencies
+- name: Ensure git-lfs installed
   run: |
-    apt update
-    apt install git-lfs
+    which git-lfs && echo "Ok" || 
+    (apt update && apt install -y git-lfs)
 ```
 
 ## Background
 
-The Github action _actions/checkout_ does not retrieve complete binaries from LFS enabled Gitea repositories when used in a Gitea action workflow. Hopefully Gitea actions will be fixed in future but for now there is a hack.
+The Github action _actions/checkout_ does not retrieve complete binaries from LFS enabled Gitea repositories when used in a Gitea action workflow. Hopefully Gitea actions will be fixed in future but for now there is a workaround.
 
 This workaround is modified from [https://gitea.com/gitea/act_runner/issues/164](https://gitea.com/gitea/act_runner/issues/164) which fixed the problem in my Gitea workflows with one small change. The change is just to use the _gitea.ref_ variable instead of the proposed _gitea.ref_name_ as I found this variable always contained the correct branch reference path in my use case and the code given did not work and this made it simpler.
 
 ```yaml
-- name: Install utils
-   run: |
-     apt-get update
-     apt-get install -y zip unzip git git-lfs
+- name: Ensure git-lfs installed
+  run: |
+    which git-lfs && echo "Ok" || 
+    (apt update && apt install -y git-lfs)
 - name: Check out repository code
   uses: actions/checkout@v4
   with:
@@ -74,6 +74,6 @@ This workaround is modified from [https://gitea.com/gitea/act_runner/issues/164]
       git lfs checkout
 ```
 
-This code can be used in any workflow when repository contains LFS files.
+These steps can be used in any workflow when the repository contains LFS files.
 
-The action just executes these same steps and provides a convenient way to be used in different workflows.
+The action just packages these same steps and provides a convenient way for it to be used in different workflows.
