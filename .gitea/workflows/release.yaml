@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Job info
+        run: |
+          echo '🎉 Triggered by a ${{ gitea.event_name }} event'
+          echo '🐧 Running on ${{ runner.os }} server'
+          echo '🔎 Branch name is ${{ gitea.ref }} and repository is ${{ gitea.repository }}'
+
+      - name: Version info
+        run: |
+          echo 'Release Version: ${{ gitea.ref_name }}'
+
