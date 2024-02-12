@@ -4,10 +4,11 @@ description: 🚀 Action to retrieve LFS files in a Gitea workflow
 runs:
   using: composite
   steps:
-    - name: Audit tools
+    - name: Check git-lfs installed
       shell: bash
       run: |
-        which git git-lfs
+        which git git-lfs && echo "Ok" || 
+          (echo "git-lfs not installed" && exit 1)
         git version
         git lfs version
 
